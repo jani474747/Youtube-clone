@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Youtube</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="nav"></div>
+    <div id="blank"></div>
+    <section id="holl">
+      <div>
+        <div id="pl_back">
+          <div id="screen"></div>
+          <div id="INFO">
+            <div id="tp">
+              <div id="N"></div>
+              <div id="L"></div>
+            </div>
+            <div id="bt">
+              <div class="circ"></div>
+              <div id="creat">
+                <div id="create1"></div>
+                <div>SUBSCRIBE</div>
+              </div>
+            </div>
+          </div>
+          <div id="commen">
+            <div id="commen1"></div>
+            <div id="type">
+              <p></p>
+              <input type="text" placeholder="Add a public comment..." />
+            </div>
+            <div id="restCom"></div>
+          </div>
+        </div>
+        <div id="list"></div>
+      </div>
+    </section>
+  </body>
+</html>
+<script
+  src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"
+  data-auto-a11y="true"
+></script>
+<script type="module">
+  import navbar from './IMPOR/nav.js'
+  document.getElementById('nav').innerHTML = navbar()
+  // REST
+  var V = localStorage.getItem('VID_ID')
+  V = JSON.parse(V)
+
+  var a = document.createElement('h3')
+  a.innerText = V[1]
+  var b = document.createElement('p')
+  b.innerText = V[2]
+  document.getElementById('N').append(a, b)
+  var D = document.createElement('iframe')
+  D.src = `https://www.youtube.com/embed/${V[0]}`
+  D.allow = 'fullscreen'
+  D.allow = 'autoplay'
+  document.getElementById('screen').append(D)
+
+  var p = document.createElement('p')
+  p.innerHTML = V[3]
+  var el = document.createElement('p')
+  el.innerHTML = 'Subscriber'
+  var de = document.createElement('p')
+  de.innerHTML = V[4]
+  var sm = document.createElement('p')
+  sm.innerHTML = 'SHOW MORE'
+  document.getElementById('create1').append(p, el, de, sm)
+
+  // likes
+  async function Preq() {
+    try {
+      let res = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${V[0]}&key=AIzaSyD0wGi3lv7Kb0K1YXeq8dX6gw59t_Uo__I`
+      )
+      let data = await res.json()
+      let detes = data.items[0].statistics
+      let COM = detes.commentCount
+      let dis = detes.dislikeCount
+      let lik = detes.likeCount
+      let fav = detes.favoriteCount
+      let vie = detes.viewCount
+      var LIK = document.createElement('p')
+      LIK.innerHTML = '<i class="far fa-thumbs-up"></i>' + '  ' + lik
+      var disLIK = document.createElement('p')
+      disLIK.innerHTML = '<i class="far fa-thumbs-down"></i>' + '  ' + dis
+      var ran1 = document.createElement('p')
+      ran1.innerHTML = '<i class="fas fa-share"></i>' + ' SHARE'
+      var ran2 = document.createElement('p')
+      ran2.innerHTML = '<i class="fas fa-plus"></i>' + ' SAVE'
+      var ran3 = document.createElement('p')
+      ran3.innerHTML = '<i class="fas fa-ellipsis-h"></i>'
+      document.getElementById('L').append(LIK, disLIK, ran1, ran2, ran3)
+
+      var comm = document.createElement('p')
+      comm.innerHTML = COM + ' Comments'
+      var sor = document.createElement('p')
+      sor.innerHTML = '<i class="fas fa-sort-amount-down"></i>' + ' SORT BY'
+      document.getElementById('commen1').append(comm, sor)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  Preq()
+
+  var divs = document.getElementById('restCom')
+  // COMMENT
+  async function REKT() {
+    try {
+      let reso = await fetch(
+        `https://www.googleapis.com/youtube/v3/commentThreads?key=AIzaSyD0wGi3lv7Kb0K1YXeq8dX6gw59t_Uo__I&textFormat=plainText&part=snippet&videoId=${V[0]}&maxResults=50`
+      )
+      let data = await reso.json()
+
+      data.items.map(function (s) {
+        var NAME = s.snippet.topLevelComment.snippet.authorDisplayName
+        var NAME_im = s.snippet.topLevelComment.snippet.authorProfileImageUrl
+        var NAME_COM = s.snippet.topLevelComment.snippet.textDisplay
+        var NAME_L = s.snippet.topLevelComment.snippet.likeCount
+
+        var d = document.createElement('div')
+        var d1 = document.createElement('div')
+        var pp = document.createElement('p')
+        var p_img = document.createElement('img')
+        p_img.src = NAME_im
+        pp.append(p_img)
+        d1.append(pp)
+        var d2 = document.createElement('div')
+        var h3 = document.createElement('h3')
+        h3.innerHTML = NAME
+        var h5 = document.createElement('h5')
+        h5.innerHTML = NAME_COM
+        d2.append(h3, h5)
+        d.append(d1, d2)
+        divs.append(d)
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  REKT()
+
+  var sen = document.getElementById('list')
+  async function QReq() {
+    try {
+      var inp = localStorage.getItem('INP')
+
+      let resp = await fetch(
+        `https://youtube.googleapis.com/youtube/v3/search?q=${inp}&part=snippet&maxResults=50&order=relevance&type=video&parentId=UgzDE2tasfmrYLyNkGt4AaABAg&key=AIzaSyD0wGi3lv7Kb0K1YXeq8dX6gw59t_Uo__I`
+      )
+      let data = await resp.json()
+      console.log(data)
+      data.items.map(function (i) {
+        console.log(i)
+
+        var vid = i.id.videoId
+
+        var Tit = i.snippet.channelTitle
+        var dat = i.snippet.publishedAt
+        var ima = i.snippet.thumbnails.medium.url
+        var Vtit = i.snippet.title
+        var des = i.snippet.description
+        let BUT = document.createElement('button')
+        BUT.style.border = 'none'
+        BUT.onclick = function () {
+          var AB = [vid, Vtit, dat, Tit, des]
+          window.open('vi_hollow.html')
+          localStorage.setItem('VID_ID', JSON.stringify(AB))
+        }
+        let div = document.createElement('div')
+        div.style.overflow = 'hidden'
+        let d3 = document.createElement('div')
+        let img = document.createElement('img')
+        img.style.width = '150px'
+        d3.append(img)
+        img.src = ima
+        img.setAttribute('class', 'IMGA')
+        let d2 = document.createElement('div')
+        let h3 = document.createElement('h3')
+        h3.innerText = Vtit
+        let h5 = document.createElement('h5')
+        h5.innerText = Tit
+        d2.append(h3, h5)
+        div.append(d3, d2)
+        BUT.append(div)
+        sen.append(BUT)
+      })
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  QReq()
+</script>
